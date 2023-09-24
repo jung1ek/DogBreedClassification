@@ -38,16 +38,23 @@ class CNNBlock(nn.Module):
         )
         self.bn = nn.BatchNorm2d(out_channels)
         self.silu = nn.SiLU()
-    def forward(x):
+    def forward(self, x):
         return self.silu(self.bn(self.cnn(x)))
 
 class SqueezeExcitation(nn.Module): # compute attention score for each channel.
     def __init__(self, in_channels, reduced_dim):
         super(SqueezeExcitation, self).__init__()
         self.se = nn.Sequential(
-            
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(in_channels,reduced_dim,1),
+            nn.SiLU(),
+            nn.Conv2d(reduced_dim,in_channels,1),
+            nn.Sigmoid(),
 
         )
+    def forward(self, x):
+        return x *self.se(x)
+
 
 class InvertedResidualBlock(nn.Module):
     pass
