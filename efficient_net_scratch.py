@@ -26,12 +26,12 @@ phi_values = {
 }
 
 class CNNBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernal_size, stride,pading,groups=1):
+    def __init__(self, in_channels, out_channels, kernal_size, stride,padding,groups=1):
         super(CNNBlock,self).__init__()
         self.cnn = nn.Conv2d(
             in_channels,
             out_channels,
-            kernel_size,
+            kernal_size,
             stride,
             padding,
             groups=in_channels
@@ -57,7 +57,22 @@ class SqueezeExcitation(nn.Module): # compute attention score for each channel.
 
 
 class InvertedResidualBlock(nn.Module):
-    pass
+    # reduction = squeeze excitation and survial_prob = for stochastic depth
+    def __init__(self, in_channels, out_channels, kernal_size, stride, padding, expand_ratio,reduction=4, survival_prob=0.8):
+        super(InvertedResidualBlock,self).__init__()
+        self.survival_prob = 0.8
+        self.use_residual = in_channels == out_channels and stride == 1
+        hidden_dim = in_channels * expand_ratio
+        self.expand = in_channels != hidden_dim
+        reduced_dim = int(in_channels/ reduction)
+
+        if self.expand:
+            self.expand_con= CNNBlock(
+                in_channels, hidden_dim, kernal_size=3, stride=1, padding=1
+            )
+        self.conv = nn.Sequential()
+
+
 
 class EfficientNet(nn.Module):
     pass
