@@ -34,7 +34,8 @@ class CNNBlock(nn.Module):
             kernal_size,
             stride,
             padding,
-            groups=in_channels
+            groups=in_channels,
+            bias=False,
         )
         self.bn = nn.BatchNorm2d(out_channels)
         self.silu = nn.SiLU()
@@ -70,7 +71,19 @@ class InvertedResidualBlock(nn.Module):
             self.expand_con= CNNBlock(
                 in_channels, hidden_dim, kernal_size=3, stride=1, padding=1
             )
-        self.conv = nn.Sequential()
+        self.conv = nn.Sequential(
+            CNNBlock(hidden_dim, hidden_dim, kernal_size, stride, padding, groups=hidden_dim),
+            SqueezeExcitation(hidden_dim, reduced_dim,),
+            nn.Conv2d(hidden_dim,out_channels,1,bias=False),
+            nn.BatchNorm2d(out_channels),
+         )
+    def stochastic_depth(self,x):
+        if not self.training:
+            return x
+
+        binary_tensor = torch.rand(x.shape[0], 1,1,1,device=x.device)<self.survival_prob
+        return torch.div(x,self.survival_prob) * binary_tensor
+        
 
 
 
