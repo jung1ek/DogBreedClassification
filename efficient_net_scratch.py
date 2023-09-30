@@ -68,7 +68,7 @@ class InvertedResidualBlock(nn.Module):
         reduced_dim = int(in_channels/ reduction)
 
         if self.expand:
-            self.expand_con= CNNBlock(
+            self.expand_conv= CNNBlock(
                 in_channels, hidden_dim, kernal_size=3, stride=1, padding=1
             )
         self.conv = nn.Sequential(
@@ -83,6 +83,9 @@ class InvertedResidualBlock(nn.Module):
 
         binary_tensor = torch.rand(x.shape[0], 1,1,1,device=x.device)<self.survival_prob
         return torch.div(x,self.survival_prob) * binary_tensor
+    
+    def forward(self, inputs):
+        x = self.expand_conv
         
 
 
