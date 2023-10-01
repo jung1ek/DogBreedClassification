@@ -85,14 +85,16 @@ class InvertedResidualBlock(nn.Module):
         return torch.div(x,self.survival_prob) * binary_tensor
     
     def forward(self, inputs):
-        x = self.expand_conv
+        x = self.expand_conv(inputs) if self.expand else inputs
+
+        if self.use_residual:
+            return self.stochastic_depth(self.conv(x)) + inputs
+        else:
+            return self.conv(x)
         
-
-
-
+        
 class EfficientNet(nn.Module):
     pass
-
 
 
 
