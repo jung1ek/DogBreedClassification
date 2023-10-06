@@ -94,7 +94,6 @@ class InvertedResidualBlock(nn.Module):
         
         
 class EfficientNet(nn.Module):
-    pass
-
-
-
+    def __init__(self, version, num_classes):
+        super(EfficientNet,self).__init__()
+        
